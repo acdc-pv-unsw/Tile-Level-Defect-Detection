@@ -22,6 +22,7 @@ regarding where the defect is on the cell. Therefore, this defect detection meth
 provides a "tile level" localisation.
 
 Deep learning models include:
+
     - SqueezeNet
     - AlexNet
     - VggNet16 & 19
