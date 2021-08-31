@@ -16,7 +16,6 @@ Deep learning models include:
     - AlexNet
     - VggNet16 & 19
     - ResNet18 & 34
-    - LumiNet (Vggnet trained to predict cell efficiency from EL)
 
 The transfer learning only involves redesigning the fully connected (FC) layers of the
 nearal network. It takes the output of the last CNN block and through 3 FC layers
@@ -183,7 +182,7 @@ def Controlled_Split(df,TT_ratio,TV_ratio,random_seed):
 # Function for choosing model function with transfer learning
 def Model_Selection(model_choice):
     '''Model choices available'''
-    model_list = "AlexNet, SqueezeNet, LumiNet, VggNet16, VggNet19, ResNet18, ResNet34"
+    model_list = "AlexNet, SqueezeNet, VggNet16, VggNet19, ResNet18, ResNet34"
 
     # Load in chosen model
     if model_choice == "SqueezeNet":
@@ -194,26 +193,6 @@ def Model_Selection(model_choice):
         # change the internal num_classes variable rather than redefining the forward pass
         model.num_classes = num_classes
         print('Loading untrained squeezenet')
-
-    elif model_choice == "LumiNet":
-        model_path = pkl_dir
-        Obj = LoadObj(model_path,'\YoannEFF.pkl')
-        model = Obj['CNN']['model_extractor']
-        # Freeze parameters so we don't backprop through them
-        for param in model.features[0:24].parameters():
-            param.requires_grad = False
-        classifierYoann = nn.Sequential(OrderedDict([
-                                  ('fc1', nn.Linear(25088, 2048)),
-                                  ('relu1', nn.ReLU()),
-                                  ('dropout1', nn.Dropout(p=0.5)),
-                                  ('fc2', nn.Linear(2048, 512)),
-                                  ('relu2', nn.ReLU()),
-                                  ('dropout2', nn.Dropout(p=0.5)),
-                                  ('fc3', nn.Linear(512, 3)),
-                                  ('output', nn.Softmax(dim=1))
-                                  ]))
-        model.classifier = classifierYoann
-        print('Loading pretrained LumiNet (VGG)')
 
     elif model_choice == "VggNet16":
             model = models.vgg16(pretrained=True)
@@ -559,7 +538,7 @@ Multiple instances are used to provide some statistics on the test set results
 
 Keep in mind the training loop spans across all the different subcells
 '''
-# All_models = ["AlexNet, Squeeze, YoannEff, VGG16, VGG19, ResNet18, ResNet34"]
+# All_models = ["AlexNet, Squeeze, VGG16, VGG19, ResNet18, ResNet34"]
 All_models = ["AlexNet","VggNet19"]
 no_instances = 3
 
@@ -617,7 +596,7 @@ for model_choice in All_models:
         # Load the data and build data loaders
         tile_dir = os.path.join(data_dir,'tiles_imgs') # Dir of tiles
         tile_paths = FullPathDirList(tile_dir) # grabs the whole path of the tile images
-        
+
         df = pd.read_csv(os.path.join(data_dir,"Tiles_labels_new"+busbar_status+".csv")) # # DF of tiles with labels
         df['Tile Path'] = tile_paths # change the path list such that the images are obtainable
         u, counts = np.unique(df['Label'],return_counts=True)
