@@ -1,0 +1,2 @@
+This folder is used to organise all the saved python objects, or save models when re-training them.
+
